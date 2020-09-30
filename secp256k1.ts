@@ -1,3 +1,5 @@
+/*! noble-secp256k1 - MIT License (c) Paul Miller (paulmillr.com) */
+'use strict';
 // https://www.secg.org/sec2-v2.pdf
 // Curve fomula is y^2 = x^3 + ax + b
 const CURVE = {
@@ -36,11 +38,11 @@ class Point {
     add(other: Point): Point {
         const [a, b] = [this, other];
         const [X1, Y1, X2, Y2] = [a.x, a.y, b.x, b.y];
-        if (X1 == 0n || Y1 == 0n) return b;
-        if (X2 == 0n || Y2 == 0n) return a;
-        if (X1 == X2 && Y1 == Y2) return this.double();
-        if (X1 == X2 && Y1 == -Y2) return Point.ZERO;
-        const lam = mod(Y2 - Y1) * invert(X2 - X1, CURVE.P);
+        if (X1 === 0n || Y1 === 0n) return b;
+        if (X2 === 0n || Y2 === 0n) return a;
+        if (X1 === X2 && Y1 === Y2) return this.double();
+        if (X1 === X2 && Y1 === -Y2) return Point.ZERO;
+        const lam = mod((Y2 - Y1) * invert(X2 - X1, CURVE.P));
         const X3 = mod(lam * lam - X1 - X2);
         const Y3 = mod(lam * (X1 - X3) - Y1);
         return new Point(X3, Y3);
@@ -58,7 +60,7 @@ class Point {
     }
 }
 
-function mod(a: bigint, b: bigint = CURVE.P) {
+function mod(a: bigint, b: bigint = CURVE.P): bigint {
     const result = a % b;
     return result >= 0 ? result : b + result;
 }
@@ -81,7 +83,7 @@ function egcd(a: bigint, b: bigint) {
 }
 
 function invert(number: bigint, modulo: bigint = CURVE.P) {
-    if (number == 0n || number <= 0n) {
+    if (number === 0n || modulo <= 0n) {
         throw new Error('invert: expected positive integers');
     }
     let [gcd, x] = egcd(mod(number, modulo), modulo);
@@ -97,4 +99,4 @@ function getPublicKey(privKey: bigint) {
     return G.multiplyDA(privKey);
 }
 
-console.log(getPublicKey(140n));
+console.log(getPublicKey(64165165165165165161561n));
